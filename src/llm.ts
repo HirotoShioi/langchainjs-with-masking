@@ -15,7 +15,10 @@ export class SecureChatOpenAI extends ChatOpenAI {
     if (typeof content === 'string') {
       const masked = await maskSecrets(content);
       message.content = masked.maskedText;
-    } else if (Array.isArray(content)) {
+      return message;
+    }
+
+    if (Array.isArray(content)) {
       const maskedContentParts = await Promise.all(
         content.map(async (part) => {
           if (
@@ -31,9 +34,11 @@ export class SecureChatOpenAI extends ChatOpenAI {
         }),
       );
       message.content = maskedContentParts as MessageContent;
+      return message;
     }
     return message;
   }
+
   override async _generate(
     messages: BaseMessage[],
     options: this['ParsedCallOptions'],
